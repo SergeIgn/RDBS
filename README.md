@@ -1,7 +1,9 @@
 # RDBS
 
 Tables.txt  - data structure
+
 Data.txt    - the data itself
+
 app.py      - ORM
 
 ## SELECT commands
