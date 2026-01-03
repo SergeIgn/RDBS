@@ -1,0 +1,105 @@
+-- Authors table
+CREATE TABLE Authors (
+    id_author SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    birthdate DATE,
+    nationality VARCHAR(100)
+);
+
+-- Genres table
+CREATE TABLE Genres (
+    id_genre SERIAL PRIMARY KEY,
+    genre_name VARCHAR(100) NOT NULL
+);
+
+-- Members table
+CREATE TABLE Members (
+    id_member SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    phone_number VARCHAR(20) NOT NULL,
+    contact_address TEXT,
+    add_date DATE NOT NULL
+);
+
+-- Positions table
+CREATE TABLE Positions (
+    id_pos SERIAL PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    salary NUMERIC(10,2) NOT NULL,
+    id_manager INTEGER REFERENCES Positions(id_pos)
+);
+
+-- Employees table
+CREATE TABLE Employees (
+    id_employee SERIAL PRIMARY KEY,
+    id_pos INTEGER REFERENCES Positions(id_pos) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    birthdate DATE NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    phone_number VARCHAR(20) NOT NULL,
+    contact_address TEXT NOT NULL,
+    permanent_address TEXT,
+    hired_date DATE NOT NULL,
+    hired_until DATE,
+    insurance BOOLEAN
+);
+
+-- Items table
+CREATE TABLE Items (
+    id_item SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    type VARCHAR(50),
+    publisher VARCHAR(100),
+    language VARCHAR(50),
+    code VARCHAR(20) UNIQUE,
+    pages INTEGER
+);
+
+-- Items_Authors table (many-to-many relationship)
+CREATE TABLE Items_Authors (
+    id_item INTEGER REFERENCES Items(id_item),
+    id_author INTEGER REFERENCES Authors(id_author),
+    PRIMARY KEY (id_item, id_author)
+);
+
+-- Items_Genres table (many-to-many relationship)
+CREATE TABLE Items_Genres (
+    id_item INTEGER REFERENCES Items(id_item),
+    id_genre INTEGER REFERENCES Genres(id_genre),
+    PRIMARY KEY (id_item, id_genre)
+);
+
+-- Labels for books ('Available', 'Loaned', 'Lost')
+CREATE TABLE Labels (
+    id_label SERIAL PRIMARY KEY,
+    id_item INTEGER REFERENCES Items(id_item),
+    status VARCHAR(20) DEFAULT 'Available'
+);
+
+-- Labels_Members_Employees table (loan records)
+CREATE TABLE Labels_Members_Employees (
+    id_loan SERIAL PRIMARY KEY,
+    id_member INTEGER REFERENCES Members(id_member),
+    id_employee INTEGER REFERENCES Employees(id_employee),
+    id_label INTEGER REFERENCES Labels(id_label),
+    loan_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    due_date DATE NOT NULL,
+    returned_date DATE
+);
+
+ALTER TABLE Employees
+ADD CONSTRAINT chk_employee_birthdate_past
+CHECK (birthdate < CURRENT_DATE);
+
+ALTER TABLE Members
+ADD CONSTRAINT chk_member_add_date_past_or_today
+CHECK (add_date <= CURRENT_DATE);
+
+ALTER TABLE Labels_Members_Employees
+ADD CONSTRAINT chk_returned_after_loan
+CHECK (returned_date IS NULL OR returned_date >= loan_date);
+
