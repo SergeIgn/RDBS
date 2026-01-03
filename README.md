@@ -1,5 +1,9 @@
 # RDBS
 
+Tables.txt  - data structure
+Data.txt    - the data itself
+app.py      - ORM
+
 ## SELECT commands
 
 ```sql
@@ -152,6 +156,8 @@ INSERT INTO Authors (id_author, first_name, last_name, birthdate, nationality)
 VALUES (53,'George', 'Orwell', '1903-06-25', 'British');
 ```
 
+Fulltext search
+
 ```sql
 -- Use before and after creating the index
 EXPLAIN ANALYZE
@@ -216,6 +222,8 @@ SELECT get_unclosed_loan_count(1);
 ```
 
 ## PROCEDURE
+
+Find members with overdue loans and simulate notifing them by raising a notice
 
 ```sql
 CREATE OR REPLACE PROCEDURE notify_overdue_members()
